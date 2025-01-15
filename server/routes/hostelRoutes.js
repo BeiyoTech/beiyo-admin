@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
   // await mappingResidentToHostel();
   const { page = 1, limit = 10  } = req.params;
   const hostels = await Hostel.find()
-  .select('-totalTenants -totalTickets -totalPendingTickets -totalClosedTickets -totalRooms -totalBeds -managerTickets -adminTickets -residents -amenities -ownerRent -monthlyExpenses -maxPrice' )
+  .select('-totalTenants -totalTickets -totalPendingTickets -totalClosedTickets -totalRooms -totalBeds -managerTickets -adminTickets -residents -amenities -ownerRent -monthlyExpenses' )
   .sort({ siteTotalRemainingBeds: -1, name: 1 })
   .skip((page - 1) * limit)
   .limit(parseInt(limit));
