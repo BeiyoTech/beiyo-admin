@@ -1,0 +1,128 @@
+/* General Layout */
+.invoice-preview {
+    background-color: white;
+    margin: 0 auto;
+    border-radius: 10px;
+    width: 794px; /* A4 width in pixels at 96dpi */
+    min-height: 1223px; /* A4 height in pixels at 96dpi */
+    border: 1px solid #ccc;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .invoice-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    position: relative;
+    padding-bottom: 10px;
+  }
+  
+  .invoice-title::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #000; /* Black line */
+    margin-top: 10px;
+  }
+  
+  
+  /* Header */
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+  }
+  
+  .bill-to,
+  .invoice-info {
+    width: 370px; /* Fixed width to match layout */
+  }
+  
+  /* Section Details */
+  .order-invoice-details,
+  .shipping-invoice-details {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .left,
+  .middle,
+  .right {
+    width: 260px; /* Fixed width for consistent layout */
+  }
+  
+  /* Table for Invoice Items */
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .invoice-table th,
+  .invoice-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .invoice-table th {
+    background-color: #f4f4f4;
+  }
+  
+  /* Terms and Conditions */
+  .terms-and-conditions {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  /* Print Styling */
+  @media print {
+    .invoice-preview {
+      width: 794px;  /* A4 width */
+      min-height: 1223px;  /* A4 height */
+      box-shadow: none;
+      border: none;
+      page-break-after: always;
+    }
+  }
+  
+  /* H3 Styling */
+  h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  /* Paragraph Styling */
+  p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* buttons.css */
+  
+  .download-button, .whatsapp-button {
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 16px;
+  }
+  
+  .download-button {
+    background-color: #28a745; /* Green */
+  }
+  
+  .whatsapp-button {
+    background-color: #25D366; /* WhatsApp Green */
+  }
+  

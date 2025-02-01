@@ -4,6 +4,9 @@ import { UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../../api/apiKey';
 import "./styles/booking-form.css"
+import "./styles/InvoicePreview.css"
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 const { Option } = Select;
 import axios from "axios"
 
@@ -18,6 +21,8 @@ const ResidentForm = () => {
   const [extraDayPaymentAmount, setExtraDayPaymentAmount] = useState(0);
   const [extraDays, setExtraDays] = useState(0);
   const [load,setLoad]=useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
+const [invoiceData, setInvoiceData] = useState(null);
 
   useEffect(() => {
     // Fetch hostels
@@ -91,6 +96,9 @@ const ResidentForm = () => {
   const handleFormSubmit = async (values) => {
     console.log('Form Values:', values);
     setLoad(true);
+    
+    setInvoiceData(values); // Store invoice data
+    setShowInvoice(true); // Show invoice preview
     const formData = new FormData();
   
     Object.keys(values).forEach((key) => {
@@ -124,7 +132,50 @@ const ResidentForm = () => {
     }
   };
   
+  const downloadPDF = () => {
+    const invoiceElement = document.getElementById("invoice-preview");
+    html2canvas(invoiceElement).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
+      pdf.save(`Invoice_${invoiceData.mobileNumber}.pdf`);
+    });
+  };
+
+  const sendInvoiceWhatsApp = async () => {
+    const invoiceElement = document.getElementById("invoice-preview");
   
+    html2canvas(invoiceElement).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
+  
+      // Convert PDF to Blob
+      const pdfBlob = pdf.output("blob");
+  
+      // Create a downloadable URL for the PDF
+      const pdfURL = URL.createObjectURL(pdfBlob);
+  
+      // Auto-download the PDF
+      const a = document.createElement("a");
+      a.href = pdfURL;
+      a.download = `Invoice_${invoiceData.mobileNumber}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  
+      // Inform the user to attach the file manually
+      const message = `Hello ${invoiceData.name}, your invoice is ready.`;
+  
+      // Open WhatsApp with Pre-filled Message
+      const phoneNumber = invoiceData.mobileNumber;
+      const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  
+      setTimeout(() => {
+        window.open(whatsappURL, "_blank");
+      }, 2000); // Small delay to ensure PDF downloads before opening WhatsApp
+    });
+  };
 
   const calculateDueAmount = (values) => {
     const {
@@ -280,6 +331,109 @@ const ResidentForm = () => {
           </Button>
         </Form.Item>
       </Form>
+
+      {showInvoice && invoiceData && (
+  <div>
+  <div id="invoice-preview" className="invoice-preview">
+    {/* <h2>Payment receipt of BEIYO</h2> */}
+    <h2 className="invoice-title">Payment receipt of BEIYO</h2>
+    {/* HEADER */}
+    <header className="invoice-header">
+      <div className="bill-to">
+        <h3>Resident Details</h3>
+        <p><strong>Name:</strong> {invoiceData.name || 'N/A'}</p>
+        <p><strong>Permanent Address:</strong> {invoiceData.address || 'N/A'}</p>
+      </div>
+      <div className="invoice-info">
+        <h3>Resident Form Receipt</h3>
+        <p>Original for Records</p>
+      </div>
+    </header>
+
+    {/* FORM DETAILS */}
+    <section className="order-invoice-details">
+      <div className="left">
+        <p><strong>Form ID:</strong> {invoiceData.formID || 'N/A'}</p>
+      </div>
+      <div className="right">
+        <p><strong>Joining Date:</strong> {invoiceData.dateJoined?.format("YYYY-MM-DD") || 'N/A'}</p>
+      </div>
+    </section>
+
+    {/* ROOM AND HOSTEL DETAILS */}
+    <section className="shipping-invoice-details">
+      <div className="left">
+        <h3>Hostel Details</h3>
+        <p><strong>Hostel:</strong> {hostels.find(h => h._id === invoiceData.hostelId)?.name || 'N/A'}</p>
+        <p><strong>Room No:</strong> {rooms.find(r => r._id === invoiceData.roomNumberId)?.roomNumber || 'N/A'}</p>
+      </div>
+      <div className="middle">
+        <p><strong>Contract Term:</strong> {invoiceData.contractTerm} months</p>
+      </div>
+      <div className="right">
+        <p><strong>Due Amount:</strong> ₹{dueAmount}</p>
+      </div>
+    </section>
+
+    {/* PAYMENT DETAILS TABLE */}
+    <table className="invoice-table">
+      <thead>
+        <tr>
+          <th>Detail</th>
+          <th>Amount</th>
+          <th>Paid</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Rent</td>
+          <td>₹{invoiceData.rent}</td>
+          <td>{invoiceData.depositStatus ? "✅" : "❌"}</td>
+        </tr>
+        <tr>
+          <td>Deposit</td>
+          <td>₹{invoiceData.deposit}</td>
+          <td>{invoiceData.depositStatus ? "✅" : "❌"}</td>
+        </tr>
+        <tr>
+          <td>Maintenance Charge</td>
+          <td>₹{invoiceData.maintainaceCharge}</td>
+          <td>{invoiceData.maintainaceChargeStatus ? "✅" : "❌"}</td>
+        </tr>
+        <tr>
+          <td>Form Fee</td>
+          <td>₹{invoiceData.formFee}</td>
+          <td>{invoiceData.formFeeStatus ? "✅" : "❌"}</td>
+        </tr>
+        <tr>
+          <td>Extra Day Payment</td>
+          <td>₹{invoiceData.extraDayPaymentAmount}</td>
+          <td>{invoiceData.extraDayPaymentAmountStatus ? "✅" : "❌"}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    {/* TERMS & CONDITIONS */}
+    <section className="terms-and-conditions">
+      <h3>Notes</h3>
+      <p>1. Please review the resident form before submission.</p>
+      <p>2. Ensure all details are accurate for smooth processing.</p>
+      <p>3. Keep a copy for your records.</p>
+    </section>
+
+    {/* BUTTONS */}
+  </div>
+    <button onClick={downloadPDF} 
+    // style={buttonStyle}
+    className="download-button"
+    >Download Receipt</button>
+    <button onClick={sendInvoiceWhatsApp} 
+    // style={whatsappButtonStyle}
+    className="whatsapp-button"
+    >Send via WhatsApp</button>
+</div>
+)}
+
     </div>
   );
 };
