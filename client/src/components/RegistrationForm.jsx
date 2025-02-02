@@ -435,28 +435,28 @@ const ResidentForm = () => {
         <div>
           {/* invoice preview */}
           <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg pt-28 mb-4 px-4 sm:px-6 lg:px-8">
-            <header className="border-b-2 border-gray-100 pb-4 mb-6 flex justify-between flex-wrap">
-              <div>
+            <header className="border-b-2 border-gray-100 pb-4 mb-6 flex justify-between flex-wrap sm:flex-row flex-col items-center">
+              <div className="flex flex-col items-center justify-center">
                 <img
                   src="/images/beiyo_logo2.svg"
                   alt="logo"
-                  className="w-48 md:w-56 mb-3"
+                  className="w-48 md:w-56 mb-3 justify-center ml-4 sm:ml-0"
                 />
                 <p className="text-sm text-gray-500">
                   BEIYO TECHNVEN PRIVATE LIMITED
                 </p>
               </div>
               <div className="flex flex-col justify-center items-center">
-                <h1 className="text-gray-800 lg:text-4xl sm:text-xl">
+                <h1 className="text-gray-800 sm:text-4xl mt-4 text-xl">
                   INVOICE
                 </h1>
-                <h1 className="lg:text-xl sm:text-md">
+                <h1 className="sm:text-2xl text-lg">
                   # {invoiceData.formID || "N/A"}
                 </h1>
               </div>
             </header>
 
-            <div className="flex justify-between flex-wrap gap-4 mb-6">
+            <div className="flex justify-between flex-wrap gap-4 mb-6 relative flex-col sm:flex-row">
               <div className="space-y-1.5">
                 <h2 className="text-base font-semibold text-gray-800">
                   Bill To:
@@ -508,8 +508,8 @@ const ResidentForm = () => {
                   </p>
                 </div>
               </div>
-              <div className="md:text-right mt-2 md:mt-0">
-                <div className=" flex flex-col justify-center items-center md:float-right">
+              <div className="mt-2 md:mt-0">
+                <div className=" flex flex-col justify-center items-center absolute -top-1 right-0">
                   <h2 className="text-base font-semibold text-gray-800">
                     Date:
                   </h2>
@@ -520,13 +520,13 @@ const ResidentForm = () => {
               </div>
             </div>
 
-            <div className="mb-6 bg-[#eee] p-4 rounded-lg w-full md:w-fit">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <div className="mb-6 bg-[#eee] p-4 rounded-lg sm:w-fit w-fit md:w-fit">
+              <div className="flex md:flex-row items-start md:items-center gap-4">
                 <h2 className="text-base font-semibold text-gray-800 whitespace-nowrap">
                   Balance Due:
                 </h2>
-                <p className="text-2xl font-semibold text-gray-900">
-                  ₹{dueAmount}
+                <p className="text-xl font-semibold text-gray-900">
+                  ₹ {isNaN(dueAmount) ? 0 : dueAmount}
                 </p>
               </div>
             </div>
@@ -539,7 +539,7 @@ const ResidentForm = () => {
                       Details
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-white">
-                      Amout
+                      Amount
                     </th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-white">
                       Paid
@@ -616,13 +616,30 @@ const ResidentForm = () => {
               <div className="space-y-3 text-right mr-4">
                 <p className="text-xl font-bold text-gray-900">
                   ₹
-                  {invoiceData.deposit +
-                    invoiceData.dueAmount +
-                    invoiceData.maintenanceCharge +
-                    invoiceData.rent +
-                    invoiceData.extraDayPaymentAmount}
+                  {invoiceData &&
+                    [
+                      invoiceData.deposit,
+                      invoiceData.dueAmount,
+                      invoiceData.maintenanceCharge,
+                      invoiceData.rent,
+                      invoiceData.extraDayPaymentAmount,
+                    ]
+                      .map(Number)
+                      .reduce(
+                        (sum, value) => sum + (isNaN(value) ? 0 : value), //koi bhi value NaN na ho
+                        0
+                      )}
                 </p>
-                <p className="text-xl font-bold text-gray-900">₹</p>
+                <p className="text-xl font-bold text-gray-900">
+                  ₹
+                  {[
+                    invoiceData?.deposit || 0,
+                    invoiceData?.maintenanceCharge || 0,
+                    invoiceData?.rent || 0,
+                    invoiceData?.extraDayPaymentAmount || 0,
+                  ].reduce((sum, value) => sum + value, 0) -
+                    (invoiceData?.dueAmount || 0)}
+                </p>
               </div>
             </div>
 
