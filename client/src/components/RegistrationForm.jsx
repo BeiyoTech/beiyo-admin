@@ -617,7 +617,7 @@ const ResidentForm = () => {
                 <p className="text-xl font-bold text-gray-900">
                   ₹
                   {invoiceData.deposit +
-                    invoiceData.dueAmount +
+                    invoiceData.formFee +
                     invoiceData.maintenanceCharge +
                     invoiceData.rent +
                     invoiceData.extraDayPaymentAmount}

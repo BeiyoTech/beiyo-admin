@@ -582,7 +582,7 @@ router.get('/due/dueAmountResident', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+// living current
 router.get('/mobile/number',async(req,res)=>{
   try {
     const residents = await Resident.find({living:"current"})
