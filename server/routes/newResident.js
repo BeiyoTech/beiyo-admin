@@ -137,9 +137,8 @@ router.post('/', upload.fields([
   { name: 'image', maxCount: 1 }
 ]), async (req, res) => {
     try {
-      console.log(req.files);
         // Extract data from the form
-        const { name, email, mobileNumber, address, parentsName, parentsMobileNo, hostelId, roomNumberId, dateJoined, password, rent, deposit, contractTerm, maintainaceCharge, formFee, extraDayPaymentAmount, extraDayPaymentAmountStatus, maintainaceChargeStatus, depositStatus, formFeeStatus, extraDays } = req.body;
+        const { name, email, mobileNumber, address, parentsName, parentsMobileNo, hostelId, roomNumberId, dateJoined, password, rent, deposit, contractTerm, maintenanceCharge, formFee, extraDayPaymentAmount, extraDayPaymentAmountStatus, maintenanceChargeStatus, depositStatus, formFeeStatus, extraDays } = req.body;
         
         // Format the date
         const formattedDate = dateJoined ? dayjs(dateJoined).format('YYYY-MM-DD') : null;
@@ -163,10 +162,10 @@ router.post('/', upload.fields([
         
         // Calculate dueAmount based on statuses
         if (!depositStatus) dueAmount += Number(deposit);
-        if (!maintainaceChargeStatus) dueAmount += Number(maintainaceCharge);
+        if (!maintenanceChargeStatus) dueAmount += Number(maintenanceCharge);
         if (!formFeeStatus) dueAmount += Number(formFee);
         if (!extraDayPaymentAmountStatus) dueAmount += Number(extraDayPaymentAmount);
-    
+        console.log(dueAmount)
         // Set living status to "new" if no payments are pending
         if (!depositStatus && !extraDayPaymentAmountStatus && !maintainaceChargeStatus) {
             livingStatus = "new";
@@ -211,7 +210,7 @@ router.post('/', upload.fields([
             formFeeStatus,
             living: livingStatus,
             extraDayPaymentAmount,
-            maintainaceChargeStatus,
+            maintenanceChargeStatus,
             extraDays
         });
 
