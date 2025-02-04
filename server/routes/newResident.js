@@ -202,7 +202,7 @@ router.post('/', upload.fields([
             deposit,
             aadhaarCardUrl,
             imageUrl,
-            maintainaceCharge,
+            maintenanceCharge,
             formFee,
             dueAmount,
             extraDayPaymentAmountStatus,
