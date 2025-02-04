@@ -140,6 +140,11 @@ router.post('/', upload.fields([
         // Extract data from the form
         const { name, email, mobileNumber, address, parentsName, parentsMobileNo, hostelId, roomNumberId, dateJoined, password, rent, deposit, contractTerm, maintenanceCharge, formFee, extraDayPaymentAmount, extraDayPaymentAmountStatus, maintenanceChargeStatus, depositStatus, formFeeStatus, extraDays } = req.body;
         
+        const depositStatusBool = depositStatus === "true";
+        const extraDayPaymentAmountStatusBool = extraDayPaymentAmountStatus === "true";
+        const maintenanceChargeStatusBool = maintenanceChargeStatus === "true";
+        const formFeeStatusBool = formFeeStatus === "true";
+
         // Format the date
         const formattedDate = dateJoined ? dayjs(dateJoined).format('YYYY-MM-DD') : null;
         const contractEndDate = moment(formattedDate).add(contractTerm, 'months').format('YYYY-MM-DD');
@@ -158,17 +163,18 @@ router.post('/', upload.fields([
         const roomNumber = room.roomNumber;
         
         
-        let livingStatus = "current";
+        
         
         // Calculate dueAmount based on statuses
         let dueAmount = 0;
-        if (depositStatus===false) dueAmount += Number(deposit);
-        if (maintenanceChargeStatus===false) dueAmount += Number(maintenanceCharge);
-        if (formFeeStatus===false) dueAmount += Number(formFee);
-        if (extraDayPaymentAmountStatus===false) dueAmount += Number(extraDayPaymentAmount);
+        if (depositStatusBool===false) dueAmount += Number(deposit);
+        if (maintenanceChargeStatusBool===false) dueAmount += Number(maintenanceCharge);
+        if (formFeeStatusBool===false) dueAmount += Number(formFee);
+        if (extraDayPaymentAmountStatusBool===false) dueAmount += Number(extraDayPaymentAmount);
         console.log(dueAmount)
-        // Set living status to "new" if no payments are pending
-        if (!depositStatus && !extraDayPaymentAmountStatus && !maintenanceChargeStatus) {
+
+        // Set living status to "new" if  payments are pending
+        if (!depositStatusBool  && !extraDayPaymentAmountStatusBool && !maintenanceChargeStatusBool) {
             livingStatus = "new";
         }
 
@@ -206,12 +212,12 @@ router.post('/', upload.fields([
             maintenanceCharge,
             formFee,
             dueAmount:dueAmount,
-            extraDayPaymentAmountStatus,
-            depositStatus,
-            formFeeStatus,
+            extraDayPaymentAmountStatus:extraDayPaymentAmountStatusBool,
+            depositStatus:depositStatusBool,
+            formFeeStatus:formFeeStatusBool,
             living: livingStatus,
             extraDayPaymentAmount,
-            maintenanceChargeStatus,
+            maintenanceChargeStatus:maintenanceChargeStatusBool,
             extraDays
         });
 
