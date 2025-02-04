@@ -157,14 +157,15 @@ router.post('/', upload.fields([
         const hostelName = hostel.name;
         const roomNumber = room.roomNumber;
         
-        let dueAmount = 0;
+        
         let livingStatus = "current";
         
         // Calculate dueAmount based on statuses
-        if (!depositStatus) dueAmount += Number(deposit);
-        if (!maintenanceChargeStatus) dueAmount += Number(maintenanceCharge);
-        if (!formFeeStatus) dueAmount += Number(formFee);
-        if (!extraDayPaymentAmountStatus) dueAmount += Number(extraDayPaymentAmount);
+        let dueAmount = 0;
+        if (depositStatus===false) dueAmount += Number(deposit);
+        if (maintenanceChargeStatus===false) dueAmount += Number(maintenanceCharge);
+        if (formFeeStatus===false) dueAmount += Number(formFee);
+        if (extraDayPaymentAmountStatus===false) dueAmount += Number(extraDayPaymentAmount);
         console.log(dueAmount)
         // Set living status to "new" if no payments are pending
         if (!depositStatus && !extraDayPaymentAmountStatus && !maintenanceChargeStatus) {
