@@ -167,7 +167,7 @@ router.post('/', upload.fields([
         if (!extraDayPaymentAmountStatus) dueAmount += Number(extraDayPaymentAmount);
         console.log(dueAmount)
         // Set living status to "new" if no payments are pending
-        if (!depositStatus && !extraDayPaymentAmountStatus && !maintainaceChargeStatus) {
+        if (!depositStatus && !extraDayPaymentAmountStatus && !maintenanceChargeStatus) {
             livingStatus = "new";
         }
 
