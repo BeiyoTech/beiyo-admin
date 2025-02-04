@@ -204,7 +204,7 @@ router.post('/', upload.fields([
             imageUrl,
             maintenanceCharge,
             formFee,
-            dueAmount,
+            dueAmount:dueAmount,
             extraDayPaymentAmountStatus,
             depositStatus,
             formFeeStatus,
