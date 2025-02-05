@@ -324,7 +324,7 @@ const handleOnlinePayment = (paymentId) => {
               </Button>
               </Typography>
               <Typography color="text.secondary">
-                Maintenance Charge: {resident.maintainaceCharge}
+                Maintenance Charge: {resident.maintenanceCharge}
               </Typography>
               <Typography color="text.secondary">
                 Form Fee: {resident.formFee}

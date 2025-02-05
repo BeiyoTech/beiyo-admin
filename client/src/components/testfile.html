@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">Invoice</h1>
+            <span class="text-gray-600">#INV-001</span>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-700">Bill To:</h2>
+                <p class="text-gray-600">John Doe</p>
+                <p class="text-gray-600">123 Main Street</p>
+                <p class="text-gray-600">City, Country</p>
+            </div>
+            <div class="text-right">
+                <h2 class="text-lg font-semibold text-gray-700">Issued By:</h2>
+                <p class="text-gray-600">XYZ Company</p>
+                <p class="text-gray-600">456 Business Road</p>
+                <p class="text-gray-600">City, Country</p>
+            </div>
+        </div>
+        
+        <table class="w-full border-collapse border border-gray-300 mb-6">
+            <thead>
+                <tr class="bg-gray-200 text-gray-700">
+                    <th class="border border-gray-300 px-4 py-2">Item</th>
+                    <th class="border border-gray-300 px-4 py-2">Qty</th>
+                    <th class="border border-gray-300 px-4 py-2">Price</th>
+                    <th class="border border-gray-300 px-4 py-2">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">Product A</td>
+                    <td class="border border-gray-300 px-4 py-2">2</td>
+                    <td class="border border-gray-300 px-4 py-2">$50</td>
+                    <td class="border border-gray-300 px-4 py-2">$100</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">Product B</td>
+                    <td class="border border-gray-300 px-4 py-2">1</td>
+                    <td class="border border-gray-300 px-4 py-2">$80</td>
+                    <td class="border border-gray-300 px-4 py-2">$80</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="flex justify-between text-lg font-semibold">
+            <span>Total:</span>
+            <span>$180</span>
+        </div>
+    </div>
+</body>
+</html>

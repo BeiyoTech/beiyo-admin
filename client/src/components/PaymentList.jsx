@@ -90,14 +90,14 @@ const PaymentList = () => {
   const totalPerHostel = calculateTotalPerHostel();
 
   return (
-   <div style={{minHeight:'100vh', paddingLeft:'6rem'}}>
+   <div style={{minHeight:'100vh',}}>
      <Box sx={{ p: { xs: 2, sm: 3 } }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>Payment List</Typography>
 
-      <Card elevation={3} sx={{ mb: 4, p: 2 }}>
+      <Card  elevation={1} sx={{ mb: 4, p: 2 }}>
         <CardContent>
           <Grid container spacing={3} alignItems="flex-end">
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={2} md={4}>
               <FormControl fullWidth variant="outlined">
                 <InputLabel>Month</InputLabel>
                 <Select

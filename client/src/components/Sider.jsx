@@ -1,71 +1,60 @@
-import React, { useContext } from 'react'
-import { Flex, Layout, Menu } from 'antd';
-const { Header, Sider, Content } = Layout;
+import React, { useContext } from 'react';
+import { Layout, Menu } from 'antd';
+import { useLocation } from 'react-router-dom';
+const { Sider } = Layout;
 import {
     UserOutlined,
     HomeOutlined,
     DollarOutlined,
-    SettingOutlined,
-  } from '@ant-design/icons';
+} from '@ant-design/icons';
 import AuthContext from '../context/AuthContext';
 
 const SideBar = () => {
-  const {user,logout}=useContext(AuthContext)
+  const { user, logout } = useContext(AuthContext);
+  const location = useLocation();
+
   return (
-    <div>
-        <Sider
-    collapsible
-    breakpoint="lg"
-    collapsedWidth="80"
-    style={{ backgroundColor: '#001529',minHeight:'100vh',minWidth:'30%',position:'fixed' }}
-  >
-    <div style={{display:'flex',flexDirection:'column',gap:'0'}}>
-      <p style={{color:'white'}}>{user&&user.name}</p>
-      <p style={{color:'white'}}>{user&&user.post}</p>
-    </div>
-    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-    <a href="/hostels"><Menu.Item key="1" icon={<HomeOutlined />}>
-        Hostels
-      </Menu.Item></a>
-      <a href="/rooms">
-      <Menu.Item key="1" icon={<HomeOutlined />}>
-        Rooms
-      </Menu.Item>
-      </a>
-      <a href="/resident">
-      <Menu.Item key="2" icon={<UserOutlined />}>
-        Residents
-      </Menu.Item>
-      </a>
-    <a href="/payment">
-    <Menu.Item key="3" icon={<DollarOutlined />}>
-        Payments
-      </Menu.Item>
-    </a>
-    <a href="/monthly-summary">
-    <Menu.Item key="4" icon={<DollarOutlined />}>
-        Monthly Summary
-      </Menu.Item>
-    </a>
-    <a href="/monthly-expenses">
-    <Menu.Item key="5" icon={<DollarOutlined />}>
-       Monthly expenses
-      </Menu.Item>
-    </a>
-    <a href="/resident-registration">
-    <Menu.Item key="6" icon={<DollarOutlined />}>
-      Registration Form
-      </Menu.Item>
-    </a>
-    <button onClick={logout}>
-      logout
-    </button>
+    <Sider
+      width={256}
+      style={{ backgroundColor: '#001529', minHeight: '100vh', position: 'fixed' }}
+    >
+      <div style={{ padding: '16px', color: 'white' }}>
+        <p>{user && user.name}</p>
+        <p>{user && user.post}</p>
+      </div>
+      <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]}>
+        <Menu.Item key="/dashboard" icon={<HomeOutlined />}>
+          <a href="/dashboard">Dashboard</a>
+        </Menu.Item>
+        <Menu.Item key="/hostels" icon={<HomeOutlined />}>
+          <a href="/hostels">Hostels</a>
+        </Menu.Item>
+        <Menu.Item key="/rooms" icon={<HomeOutlined />}>
+          <a href="/rooms">Rooms</a>
+        </Menu.Item>
+        <Menu.Item key="/resident" icon={<UserOutlined />}>
+          <a href="/resident">Residents</a>
+        </Menu.Item>
+        <Menu.Item key="/payment" icon={<DollarOutlined />}>
+          <a href="/payment">Payments</a>
+        </Menu.Item>
+        <Menu.Item key="/monthly-summary" icon={<DollarOutlined />}>
+          <a href="/monthly-summary">Monthly Summary</a>
+        </Menu.Item>
+        <Menu.Item key="/monthly-expenses" icon={<DollarOutlined />}>
+          <a href="/monthly-expenses">Monthly Expenses</a>
+        </Menu.Item>
+        <Menu.Item key="/resident-registration" icon={<DollarOutlined />}>
+          <a href="/resident-registration">Registration Form</a>
+        </Menu.Item>
+      </Menu>
+      <div style={{ padding: '16px' }}>
+        <button onClick={logout} style={{ background: 'red', color: 'white', padding: '8px', border: 'none', width: '100%', cursor: 'pointer' }}>
+          Logout
+        </button>
+      </div>
+    </Sider>
+  );
+};
 
-
-    </Menu>
-
-  </Sider></div>
-  )
-}
-
-export default SideBar
+export default SideBar;

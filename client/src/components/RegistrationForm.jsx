@@ -66,7 +66,7 @@ const ResidentForm = () => {
       setSelectedRoom(room.roomNumber);
       setRent(room.price);
       setDeposit(room.price);
-      // Correct usage of setFieldsValue
+      // Set rent and deposit values in the form
       form.setFieldsValue({
         rent: room.price,
         deposit: room.price,
@@ -82,7 +82,7 @@ const ResidentForm = () => {
         const selectedDate = date.startOf("day");
         const firstDayOfMonth = dayjs().startOf("month");
 
-        // Check if the selected date is the 1st of the current month
+        // If the selected date is the 1st of the current month, no extra payment
         if (selectedDate.isSame(firstDayOfMonth)) {
           setExtraDayPaymentAmount(0);
           setExtraDays(0);
@@ -105,13 +105,11 @@ const ResidentForm = () => {
   };
 
   const handleFormSubmit = async (values) => {
-    console.log("Form Values:", values);
     setLoad(true);
-
     setInvoiceData(values); // Store invoice data
-    setShowInvoice(true); // Show invoice preview
+   
     const formData = new FormData();
-
+  
     Object.keys(values).forEach((key) => {
       if (key === "aadhaarCard" || key === "image") {
         const fileList = values[key];
@@ -125,9 +123,12 @@ const ResidentForm = () => {
         formData.append(key, values[key]);
       }
     });
-
+    
     formData.append("extraDays", extraDays);
-
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+    // setLoad(false);
     try {
       const response = await api.post(
         "https://beiyo-admin.in/api/newResident",
@@ -138,17 +139,164 @@ const ResidentForm = () => {
           },
         }
       );
+      console.log(response);
       message.success("Resident registered successfully!");
       setLoad(false);
+      // setShowInvoice(true); // Show invoice preview
+      const invoiceHTML = `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Invoice</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            @media print {
+              @page {
+                size: A4;
+                margin: 15mm;
+              }
+              body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+              #invoice-preview {
+                padding: 0;
+                box-shadow: none;
+              }
+            }
+            body {
+              font-size: 14px;
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div id="invoice-preview" class="max-w-4xl mx-auto bg-white p-6">
+            <header class="border-b border-gray-200 pb-4 mb-4">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                  <img src="/beiyo_logo2.svg" alt="Beiyo Logo" class="h-16 w-auto" />
+                  <div>
+                    <p class="text-sm text-gray-500">BEIYO TECHNVEN PRIVATE LIMITED</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <h1 class="text-2xl font-bold text-gray-800">INVOICE</h1>
+                  <p class="text-gray-600"># ${response.data?.formID || 'N/A'}</p>
+                </div>
+              </div>
+            </header>
+
+            <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+              <div>
+                <h3 class="font-semibold text-gray-800">Bill To:</h3>
+                <div class="mt-1">
+                  <p class="text-gray-600">Name: <span class="font-medium">${values.name}</span></p>
+                  <p class="text-gray-600">Phone: <span class="font-medium">${values.mobileNumber}</span></p>
+                  <p class="text-gray-600">Address: <span class="font-medium">${values.address || 'N/A'}</span></p>
+                </div>
+              </div>
+              <div class="text-right">
+                <h3 class="font-semibold text-gray-800">Hostel Details:</h3>
+                <div class="mt-1">
+                  <p class="text-gray-600">Room: <span class="font-medium">${selectedRoom || 'N/A'}</span></p>
+                  <p class="text-gray-600">Term: <span class="font-medium">${values.contractTerm} months</span></p>
+                  <p class="text-gray-600">Date: <span class="font-medium">${dayjs().format('YYYY-MM-DD')}</span></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gray-50 p-3 rounded mb-4 inline-block">
+              <p class="text-gray-800 font-semibold">Balance Due: <span class="text-lg">₹${dueAmount}</span></p>
+            </div>
+
+            <div class="overflow-x-auto mb-4">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-800 text-white">
+                  <tr>
+                    <th class="py-2 px-3 text-left">Description</th>
+                    <th class="py-2 px-3 text-right">Amount</th>
+                    <th class="py-2 px-3 text-center w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <tr>
+                    <td class="py-2 px-3">Security Deposit</td>
+                    <td class="py-2 px-3 text-right">₹${values.deposit}</td>
+                    <td class="py-2 px-3 text-center">${values.depositStatus ? '✓' : '✗'}</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-3">Maintenance Fee</td>
+                    <td class="py-2 px-3 text-right">₹${values.maintenanceCharge}</td>
+                    <td class="py-2 px-3 text-center">${values.maintenanceChargeStatus ? '✓' : '✗'}</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-3">Form Fee</td>
+                    <td class="py-2 px-3 text-right">₹${values.formFee}</td>
+                    <td class="py-2 px-3 text-center">${values.formFeeStatus ? '✓' : '✗'}</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-3">Extra Day Payment</td>
+                    <td class="py-2 px-3 text-right">₹${values.extraDayPaymentAmount}</td>
+                    <td class="py-2 px-3 text-center">${values.extraDayPaymentAmountStatus ? '✓' : '✗'}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="flex justify-end mb-4">
+              <div class="w-48">
+                <div class="flex justify-between py-1">
+                  <span class="font-medium">Total:</span>
+                  <span>₹${[
+                    Number(values.deposit) || 0,
+                    Number(values.maintenanceCharge) || 0,
+                    Number(values.formFee) || 0,
+                    Number(values.extraDayPaymentAmount) || 0
+                  ].reduce((sum, val) => sum + val, 0)}</span>
+                </div>
+                <div class="flex justify-between py-1 font-semibold">
+                  <span>Amount Due:</span>
+                  <span>₹${dueAmount}</span>
+                </div>
+              </div>
+            </div>
+
+            <footer class="border-t border-gray-200 pt-3 mt-4 text-sm">
+              <h4 class="font-medium mb-1">Notes:</h4>
+              <ol class="list-decimal list-inside text-gray-600 space-y-0.5">
+                <li>Please review the resident form before submission.</li>
+                <li>Ensure all details are accurate for smooth processing.</li>
+                <li>Keep a copy for your records.</li>
+              </ol>
+            </footer>
+          </div>
+          <script>
+            window.onload = () => {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(invoiceHTML);
+      newWindow.document.close();
+    }
       form.resetFields();
     } catch (error) {
+      console.log(error);
       message.error(
-        "Error registering resident: " + error.response?.data?.message ||
-          error.message
+        "Error registering resident: " +
+          (error.response?.data?.message || error.message)
       );
       setLoad(false);
     }
   };
+  
 
   const downloadPDF = () => {
     const invoiceElement = document.getElementById("invoice-preview");
@@ -183,17 +331,17 @@ const ResidentForm = () => {
       document.body.removeChild(a);
 
       // Inform the user to attach the file manually
-      const message = `Hello ${invoiceData.name}, your invoice is ready.`;
+      const messageText = `Hello ${invoiceData.name}, your invoice is ready.`;
 
       // Open WhatsApp with Pre-filled Message
       const phoneNumber = invoiceData.mobileNumber;
       const whatsappURL = `https://wa.me/91${phoneNumber}?text=${encodeURIComponent(
-        message
+        messageText
       )}`;
 
       setTimeout(() => {
         window.open(whatsappURL, "_blank");
-      }, 2000); // Small delay to ensure PDF downloads before opening WhatsApp
+      }, 2000); // Delay to ensure PDF downloads before opening WhatsApp
     });
   };
 
@@ -208,13 +356,16 @@ const ResidentForm = () => {
       formFeeStatus,
       extraDayPaymentAmountStatus,
     } = values;
+    
     let totalDue = 0;
-
-    if (!depositStatus) totalDue += deposit || 0;
-    if (!maintenanceChargeStatus) totalDue += maintenanceCharge || 0;
-    if (!formFeeStatus) totalDue += formFee || 0;
-    if (!extraDayPaymentAmountStatus) totalDue += extraDayPaymentAmount || 0;
-
+    
+    // Convert each value to a number (with 0 fallback) before arithmetic
+    if (!depositStatus) totalDue += Number(deposit) || 0;
+    if (!maintenanceChargeStatus) totalDue += Number(maintenanceCharge) || 0;
+    if (!formFeeStatus) totalDue += Number(formFee) || 0;
+    if (!extraDayPaymentAmountStatus) totalDue += Number(extraDayPaymentAmount) || 0;
+    
+    console.log(totalDue);
     setDueAmount(totalDue);
   };
 
@@ -231,7 +382,14 @@ const ResidentForm = () => {
       <Form
         form={form}
         layout="horizontal"
-        onValuesChange={calculateDueAmount}
+        initialValues={{
+          depositStatus: true,
+          maintenanceChargeStatus: true, // Fixed spelling here
+          formFeeStatus: true,
+          extraDayPaymentAmountStatus: true,
+          // dueAmount: 0,
+        }}
+        onValuesChange={(_, allValues) => calculateDueAmount(allValues)}
         onFinish={handleFormSubmit}
       >
         <Form.Item
@@ -264,9 +422,7 @@ const ResidentForm = () => {
         <Form.Item
           name="mobileNumber"
           label="Mobile Number"
-          rules={[
-            { required: true, message: "Please enter the mobile number" },
-          ]}
+          rules={[{ required: true, message: "Please enter the mobile number" }]}
         >
           <Input placeholder="Enter mobile number" />
         </Form.Item>
@@ -315,56 +471,28 @@ const ResidentForm = () => {
         <Form.Item
           name="dateJoined"
           label="Date Joined"
-          rules={[
-            { required: true, message: "Please select the joining date" },
-          ]}
+          rules={[{ required: true, message: "Please select the joining date" }]}
         >
           <DatePicker style={{ width: "100%" }} onChange={handleDateChange} />
         </Form.Item>
         <Form.Item name="contractTerm" label="Contract Term (Months)">
-          <InputNumber
-            min={1}
-            placeholder="Enter contract term"
-            style={{ width: "100%" }}
-          />
+          <InputNumber min={1} placeholder="Enter contract term" style={{ width: "100%" }} />
         </Form.Item>
 
         <Form.Item name="rent" label="Rent">
-          {" "}
-          <InputNumber value={rent} readOnly style={{ width: "100%" }} />{" "}
+          <InputNumber value={rent} readOnly style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item name="deposit" label="Deposit">
-          {" "}
-          <InputNumber
-            value={deposit}
-            readOnly
-            style={{ width: "100%" }}
-          />{" "}
+          <InputNumber value={deposit} readOnly style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item name="maintenanceCharge" label="Maintenance Charge">
-          <InputNumber
-            min={0}
-            placeholder="Enter maintenance charge"
-            style={{ width: "100%" }}
-          />
+          <InputNumber min={0} placeholder="Enter maintenance charge" style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item name="formFee" label="Form Fee">
-          <InputNumber
-            min={0}
-            placeholder="Enter form fee"
-            style={{ width: "100%" }}
-          />
+          <InputNumber min={0} placeholder="Enter form fee" style={{ width: "100%" }} />
         </Form.Item>
-        <Form.Item
-          name="extraDayPaymentAmount"
-          label="Extra Day Payment Amount"
-        >
-          {" "}
-          <InputNumber
-            value={extraDayPaymentAmount}
-            readOnly
-            style={{ width: "100%" }}
-          />{" "}
+        <Form.Item name="extraDayPaymentAmount" label="Extra Day Payment Amount">
+          <InputNumber value={extraDayPaymentAmount} readOnly style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item name="depositStatus" valuePropName="checked">
           <Checkbox>Deposit Paid</Checkbox>
@@ -391,10 +519,7 @@ const ResidentForm = () => {
           }}
           rules={[{ required: true, message: "Please upload Aadhaar card" }]}
         >
-          <Upload
-            maxCount={1}
-            beforeUpload={() => false} // Prevent automatic upload
-          >
+          <Upload maxCount={1} beforeUpload={() => false}>
             <Button icon={<UploadOutlined />}>Click to Upload</Button>
           </Upload>
         </Form.Item>
@@ -411,17 +536,14 @@ const ResidentForm = () => {
           }}
           rules={[{ required: true, message: "Please upload Profile Pic" }]}
         >
-          <Upload
-            maxCount={1}
-            beforeUpload={() => false} // Prevent automatic upload
-          >
+          <Upload maxCount={1} beforeUpload={() => false}>
             <Button icon={<UploadOutlined />}>Click to Upload</Button>
           </Upload>
         </Form.Item>
 
-        <Form.Item label="Due Amount">
+        {/* <Form.Item name="dueAmount" label="Due Amount" >
           <InputNumber value={dueAmount} readOnly style={{ width: "100%" }} />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item>
           <Button type="primary" htmlType="submit" disabled={load}>
@@ -431,10 +553,9 @@ const ResidentForm = () => {
       </Form>
 
       {showInvoice && invoiceData && (
-        //please change margin from top accordingly
         <div>
-          {/* invoice preview */}
-          <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg pt-28 mb-4 px-4 sm:px-6 lg:px-8">
+          {/* Invoice preview */}
+          <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg pt-28 mb-4 px-4 sm:px-6 lg:px-8" id="invoice-preview">
             <header className="border-b-2 border-gray-100 pb-4 mb-6 flex justify-between flex-wrap sm:flex-row flex-col items-center">
               <div className="flex flex-col items-center justify-center">
                 <img
@@ -458,61 +579,42 @@ const ResidentForm = () => {
 
             <div className="flex justify-between flex-wrap gap-4 mb-6 relative flex-col sm:flex-row">
               <div className="space-y-1.5">
-                <h2 className="text-base font-semibold text-gray-800">
-                  Bill To:
-                </h2>
+                <h2 className="text-base font-semibold text-gray-800">Bill To:</h2>
                 <div className="space-y-1">
                   <p className="text-gray-600">
-                    Name :{" "}
-                    <span className="font-bold text-black">
-                      {invoiceData.name || "N/A"}
-                    </span>
+                    Name: <span className="font-bold text-black">{invoiceData.name || "N/A"}</span>
                   </p>
                   <p className="text-gray-600">
-                    Phone number :{" "}
-                    <span className="font-bold text-black"></span>
+                    Phone number: <span className="font-bold text-black">{invoiceData.mobileNumber || "N/A"}</span>
                   </p>
                   <p className="text-gray-600">
-                    Permanent Address :{" "}
-                    <span className="font-bold text-black">
-                      {invoiceData.address || "N/A"}
-                    </span>
+                    Permanent Address: <span className="font-bold text-black">{invoiceData.address || "N/A"}</span>
                   </p>
                 </div>
               </div>
               <div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-800">
-                    Hostel Details:
-                  </h3>
+                  <h3 className="text-base font-semibold text-gray-800">Hostel Details:</h3>
                   <p className="text-gray-600">
-                    Hostel :
-                    <span className="font-bold text-black">
-                      {hostels.find((h) => h._id === invoiceData.hostelId)
-                        ?.name || "N/A"}
+                    Hostel: <span className="font-bold text-black">
+                      {hostels.find((h) => h._id === invoiceData.hostelId)?.name || "N/A"}
                     </span>
                   </p>
                   <p className="text-gray-600">
-                    Room No. :{" "}
-                    <span className="font-bold text-black">
-                      {rooms.find((r) => r._id === invoiceData.roomNumberId)
-                        ?.roomNumber || "N/A"}
+                    Room No.: <span className="font-bold text-black">
+                      {rooms.find((r) => r._id === invoiceData.roomNumberId)?.roomNumber || "N/A"}
                     </span>
                   </p>
                   <p className="text-gray-600">
-                    Contract Term :{" "}
-                    <span className="font-bold text-black">
-                      {" "}
+                    Contract Term: <span className="font-bold text-black">
                       {invoiceData.contractTerm} months
                     </span>
                   </p>
                 </div>
               </div>
               <div className="mt-2 md:mt-0">
-                <div className=" flex flex-col justify-center items-center absolute -top-1 right-0">
-                  <h2 className="text-base font-semibold text-gray-800">
-                    Date:
-                  </h2>
+                <div className="flex flex-col justify-center items-center absolute -top-1 right-0">
+                  <h2 className="text-base font-semibold text-gray-800">Date:</h2>
                   <p className="text-gray-600">
                     {invoiceData.dateJoined?.format("YYYY-MM-DD") || "N/A"}
                   </p>
@@ -535,67 +637,36 @@ const ResidentForm = () => {
               <table className="w-full min-w-[500px]">
                 <thead className="bg-gray-800">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-white">
-                      Details
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-white">
-                      Amount
-                    </th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-white">
-                      Paid
-                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-white">Details</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-white">Amount</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-white">Paid</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   <tr>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      Security Deposit
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      ₹{invoiceData.deposit}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">Security Deposit</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">₹{invoiceData.deposit}</td>
                     <td className="px-4 py-3 text-sm text-gray-700 text-right">
                       {invoiceData.depositStatus ? "✅" : "❌"}
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 text-sm text-gray-700">Rent</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      ₹{invoiceData.rent}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700 text-right">
-                      {invoiceData.depositStatus ? "✅" : "❌"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      Maintenance Fee
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      ₹{invoiceData.maintenanceCharge}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">Maintenance Fee</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">₹{invoiceData.maintenanceCharge}</td>
                     <td className="px-4 py-3 text-sm text-gray-700 text-right">
                       {invoiceData.maintenanceChargeStatus ? "✅" : "❌"}
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      Form Fee
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      ₹{invoiceData.formFee}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">Form Fee</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">₹{invoiceData.formFee}</td>
                     <td className="px-4 py-3 text-sm text-gray-700 text-right">
                       {invoiceData.formFeeStatus ? "✅" : "❌"}
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      Extra Day Payment
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      ₹{invoiceData.extraDayPaymentAmount}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">Extra Day Payment</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">₹{invoiceData.extraDayPaymentAmount}</td>
                     <td className="px-4 py-3 text-sm text-gray-700 text-right">
                       {invoiceData.extraDayPaymentAmountStatus ? "✅" : "❌"}
                     </td>
@@ -606,31 +677,29 @@ const ResidentForm = () => {
 
             <div className="mt-6 grid grid-cols-2 gap-4 max-w-xs md:max-w-sm ml-auto justify-center items-center">
               <div className="space-y-4 text-right">
-                <h2 className="text-base font-semibold text-gray-800">
-                  Total:
-                </h2>
-                <h2 className="text-base font-semibold text-gray-800">
-                  Amount Paid:
-                </h2>
+                <h2 className="text-base font-semibold text-gray-800">Total:</h2>
+                <h2 className="text-base font-semibold text-gray-800">Amount Paid:</h2>
               </div>
               <div className="space-y-3 text-right mr-4">
                 <p className="text-xl font-bold text-gray-900">
                   ₹
-                  {invoiceData.deposit +
-                    invoiceData.dueAmount +
-                    invoiceData.maintenanceCharge +
-                    invoiceData.rent +
-                    invoiceData.extraDayPaymentAmount}
+                  {invoiceData &&
+                    [
+                      Number(invoiceData.deposit) || 0,
+                      Number(invoiceData.formFee) || 0,
+                      Number(invoiceData.maintenanceCharge) || 0,
+                      Number(invoiceData.extraDayPaymentAmount) || 0,
+                    ].reduce((sum, value) => sum + value, 0)}
                 </p>
                 <p className="text-xl font-bold text-gray-900">
                   ₹
                   {[
-                    invoiceData?.deposit || 0,
-                    invoiceData?.maintenanceCharge || 0,
-                    invoiceData?.rent || 0,
-                    invoiceData?.extraDayPaymentAmount || 0,
+                    Number(invoiceData?.deposit) || 0,
+                    Number(invoiceData?.maintenanceCharge) || 0,
+                    Number(invoiceData?.formFee) || 0,
+                    Number(invoiceData?.extraDayPaymentAmount) || 0,
                   ].reduce((sum, value) => sum + value, 0) -
-                    (invoiceData?.dueAmount || 0)}
+                    (Number(dueAmount) || 0)}
                 </p>
               </div>
             </div>
@@ -645,18 +714,10 @@ const ResidentForm = () => {
           </div>
 
           {/* BUTTONS */}
-          <button
-            onClick={downloadPDF}
-            // style={buttonStyle}
-            className="download-button"
-          >
+          <button onClick={downloadPDF} className="download-button">
             Download Receipt
           </button>
-          <button
-            onClick={sendInvoiceWhatsApp}
-            // style={whatsappButtonStyle}
-            className="whatsapp-button"
-          >
+          <button onClick={sendInvoiceWhatsApp} className="whatsapp-button">
             Send via WhatsApp
           </button>
         </div>
