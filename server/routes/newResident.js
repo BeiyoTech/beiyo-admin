@@ -174,7 +174,7 @@ router.post('/', upload.fields([
         console.log(dueAmount)
 
         // Set living status to "new" if  payments are pending
-        if (!depositStatusBool  && !extraDayPaymentAmountStatusBool && !maintenanceChargeStatusBool) {
+        if (depositStatusBool===false  && extraDayPaymentAmountStatusBool===false && !maintenanceChargeStatusBool===false) {
             livingStatus = "new";
         }
 
@@ -251,7 +251,7 @@ router.post('/', upload.fields([
         await generateDueCharge(resident._id);
 
         // Update payments if deposit or extra day payment exists
-        if (depositStatus || extraDayPaymentAmountStatus) {
+        if (depositStatusBool===true || extraDayPaymentAmountStatusBool===true) {
             const paymentUpdatedResident = await generateMonthlyPayments(newResident._id, newResident.contractEndDate);
         }
 
