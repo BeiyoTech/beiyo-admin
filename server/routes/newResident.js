@@ -27,6 +27,11 @@ const { uploadToS3 } = require('../config/aws');
 router.post('/websiteBooking',async(req,res)=>{
   try {
     const {name, email, mobileNumber,hostelId,roomNumberId,dateJoined,rent,deposit,depositStatus,maintainaceCharge,maintainaceChargeStatus,formFee,formFeeStatus,contractTerm,extraDayPaymentAmount,extraDayPaymentAmountStatus,extraDays,gender} = req.body;
+    const depositStatusBool = depositStatus === "true";
+    const extraDayPaymentAmountStatusBool = extraDayPaymentAmountStatus === "true";
+    const maintenanceChargeStatusBool = maintenanceChargeStatus === "true";
+    const formFeeStatusBool = formFeeStatus === "true";
+    
     const formattedDate = dateJoined ? dayjs(dateJoined).format('YYYY-MM-DD') : null;
     const contractEndDate = moment(formattedDate).add(contractTerm, 'months').format('YYYY-MM-DD');
     const Hostel = await Hostels.findById(hostelId);
@@ -35,21 +40,17 @@ router.post('/websiteBooking',async(req,res)=>{
     const roomNumber  = Room.roomNumber;
     let dueAmount = 0;
     let livingStatus = "current";
-    if(!depositStatus){
-      dueAmount += Number(deposit);
-    }
-    if(!maintainaceChargeStatus){
-      dueAmount += Number(maintainaceCharge);
-    }
-    if(!formFeeStatus){
-      dueAmount += Number(formFee);
-    }
-    if(!extraDayPaymentAmountStatus){
-      dueAmount += Number(extraDayPaymentAmount);
-    }
+ 
+    if (depositStatusBool===false) dueAmount += Number(deposit);
+    if (maintenanceChargeStatusBool===false) dueAmount += Number(maintenanceCharge);
+    if (formFeeStatusBool===false) dueAmount += Number(formFee);
+    if (extraDayPaymentAmountStatusBool===false) dueAmount += Number(extraDayPaymentAmount);
+    console.log(dueAmount)
 
-    if(!depositStatus&&!extraDayPaymentAmountStatus&&!maintainaceChargeStatus){
-       livingStatus = "new"
+    
+    // Set living status to "new" if  payments are pending
+    if (depositStatusBool===false  && extraDayPaymentAmountStatusBool===false && maintenanceChargeStatusBool===false) {
+        livingStatus = "new";
     }
 
      const newResident = new Resident({
@@ -173,6 +174,7 @@ router.post('/', upload.fields([
         if (extraDayPaymentAmountStatusBool===false) dueAmount += Number(extraDayPaymentAmount);
         console.log(dueAmount)
 
+        let livingStatus="current";
         // Set living status to "new" if  payments are pending
         if (depositStatusBool===false  && extraDayPaymentAmountStatusBool===false && maintenanceChargeStatusBool===false) {
             livingStatus = "new";
