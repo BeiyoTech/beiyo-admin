@@ -26,12 +26,12 @@ const { uploadToS3 } = require('../config/aws');
 
 router.post('/websiteBooking',async(req,res)=>{
   try {
-    const {name, email, mobileNumber,hostelId,roomNumberId,dateJoined,rent,deposit,depositStatus,maintainaceCharge,maintainaceChargeStatus,formFee,formFeeStatus,contractTerm,extraDayPaymentAmount,extraDayPaymentAmountStatus,extraDays,gender} = req.body;
+    const {name, email, mobileNumber,hostelId,roomNumberId,dateJoined,rent,deposit,depositStatus,maintenanceCharge,maintenanceChargeStatus,formFee,formFeeStatus,contractTerm,extraDayPaymentAmount,extraDayPaymentAmountStatus,extraDays,gender} = req.body;
     const depositStatusBool = depositStatus === "true";
     const extraDayPaymentAmountStatusBool = extraDayPaymentAmountStatus === "true";
     const maintenanceChargeStatusBool = maintenanceChargeStatus === "true";
     const formFeeStatusBool = formFeeStatus === "true";
-    
+
     const formattedDate = dateJoined ? dayjs(dateJoined).format('YYYY-MM-DD') : null;
     const contractEndDate = moment(formattedDate).add(contractTerm, 'months').format('YYYY-MM-DD');
     const Hostel = await Hostels.findById(hostelId);
@@ -64,13 +64,13 @@ router.post('/websiteBooking',async(req,res)=>{
       contractTerm,
       rent:rent,
       deposit:deposit,
-      maintainaceCharge:maintainaceCharge,
+      maintenanceCharge:maintenanceCharge,
       formFee:formFee,
       dueAmount:dueAmount,
       extraDayPaymentAmount:extraDayPaymentAmount,
       extraDayPaymentAmountStatus:extraDayPaymentAmountStatus,
       depositStatus:depositStatus,
-      maintainaceChargeStatus:maintainaceChargeStatus,
+      maintenanceChargeStatus:maintenanceChargeStatus,
       formFeeStatus:formFeeStatus,
       extraDays,
       gender,

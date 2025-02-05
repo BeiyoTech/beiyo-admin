@@ -29,6 +29,7 @@ const Member = require('./routes/Member')
 const razorPay = require('./routes/RazorPayPayment')
 const notification = require('./routes/notification')
 const faq = require('./routes/Faq');
+const adminDashboard = require('./routes/adminDashBoard');
 
 const app = express();
 
@@ -45,6 +46,8 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true
 }));
+
+
 
 
 // // Middleware to check API key
@@ -111,6 +114,7 @@ app.use('/api/Otp',otp)
 app.use('/api/pay/razor',razorPay)
 app.use('/api/notification',notification)
 app.use('/api/faq',faq)
+app.use('/api/adminDashboard',adminDashboard)
 
 
 // Start the server
