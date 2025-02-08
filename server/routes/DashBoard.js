@@ -445,7 +445,7 @@ router.get('/oldTickets/:userid',async(req,res)=>{
 router.get('/monthlyPaymentDue/resident', async (req, res) => {
   try {
     // Step 1: Filter payments based on month, status, and type
-    const payments = await Payment.find({ month: "2025-01", status: 'due', type: 'rent' });
+    const payments = await Payment.find({ month: "2025-02", status: 'due', type: 'rent' });
     const userIds = payments.map(payment => payment.userId);
 
     // Step 2: Retrieve residents based on the filtered user IDs

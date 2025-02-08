@@ -38,7 +38,7 @@ const residentSchema = new mongoose.Schema({
   amount:{type:String},
   contract:{type:Date},
   hostelId:{type : mongoose.Schema.Types.ObjectId,ref:'Hostel'},
-  living:{type:String,default:'current',enum:['current','old','new']},
+  living:{type:String,default:'current',enum:['current','old','new','expired']},
   maintenanceCharge:{type:Number},
   formFee:{type:Number},
   dueAmount:{type:Number,default:0},
@@ -63,7 +63,9 @@ const residentSchema = new mongoose.Schema({
   ]
 
   // other fields
-});
+},
+{ timestamps: true } // Automatically adds createdAt and updatedAt
+);
 residentSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);

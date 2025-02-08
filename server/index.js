@@ -38,8 +38,9 @@ config();
 const URL1 = process.env.ALLOW_URL_1
 const URL2 = process.env.ALLOW_URL_2
 const URL3 = process.env.ALLOW_URL_3
+const URL4 =process.env.ALLOW_URL_4
 
-const allowedOrigins = [URL1,URL2,URL3
+const allowedOrigins = [URL1,URL2,URL3,URL4
   // 'http://localhost:5000'
 ];
 app.use(cors({
