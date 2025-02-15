@@ -19,11 +19,11 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 const { Option } = Select;
 import axios from "axios";
-
+import useFetchHostels from "../hooks/useFetchHostels"; 
 const ResidentForm = () => {
   const [form] = Form.useForm();
   const [dueAmount, setDueAmount] = useState(0);
-  const [hostels, setHostels] = useState([]);
+  // const [hostels, setHostels] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [rent, setRent] = useState(0);
@@ -34,19 +34,20 @@ const ResidentForm = () => {
   const [showInvoice, setShowInvoice] = useState(false);
   const [invoiceData, setInvoiceData] = useState(null);
 
-  useEffect(() => {
-    // Fetch hostels
-    const fetchHostels = async () => {
-      try {
-        const response = await api.get("https://beiyo-admin.in/api/hostels");
-        setHostels(response.data);
-      } catch (error) {
-        message.error("Error fetching hostels: " + error.message);
-      }
-    };
+  // useEffect(() => {
+  //   // Fetch hostels
+  //   const fetchHostels = async () => {
+  //     try {
+  //       const response = await api.get("https://beiyo-admin.in/api/hostels");
+  //       setHostels(response.data);
+  //     } catch (error) {
+  //       message.error("Error fetching hostels: " + error.message);
+  //     }
+  //   };
 
-    fetchHostels();
-  }, []);
+  //   fetchHostels();
+  // }, []);
+  const hostels = useFetchHostels();
 
   const handleHostelChange = async (hostelId) => {
     try {
