@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Button, TextField, Typography, Select, MenuItem, InputLabel, FormControl, CssBaseline, Grid } from '@mui/material';
 import dayjs from 'dayjs';
+import useFetchHostels from '../hooks/useFetchHostels';
 
 const StudentForm = () => {
-  const [hostels, setHostels] = useState([]);
+  // const [hostels, setHostels] = useState([]);
   const [rooms, setRooms] = useState([]);
   // const [price,setPrice] = useState(null);
   
@@ -26,19 +27,19 @@ const StudentForm = () => {
   });
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    const fetchHostels = async () => {
-      try {
-        const response = await axios.get('https://beiyo-admin.vercel.app/api/hostels');
-        setHostels(response.data);
-      } catch (error) {
-        console.error('Error fetching hostels:', error);
-      }
-    };
-    fetchHostels();
-  }, []);
+  // useEffect(() => {
+  //   const fetchHostels = async () => {
+  //     try {
+  //       const response = await axios.get('https://beiyo-admin.vercel.app/api/hostels');
+  //       setHostels(response.data);
+  //     } catch (error) {
+  //       console.error('Error fetching hostels:', error);
+  //     }
+  //   };
+  //   fetchHostels();
+  // }, []);
 
-
+  const hostels = useFetchHostels(); 
 
 
   const handleChange = (e) => {

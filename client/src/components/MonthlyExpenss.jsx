@@ -288,7 +288,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Button, Form, Modal, Space, Select, DatePicker, message, Row, Col } from 'antd';
-
+import useFetchHostels from '../hooks/useFetchHostels';
 import moment from 'moment';
 import api from '../../api/apiKey';
 
@@ -303,15 +303,17 @@ const MonthlyExpenses = () => {
   const [form] = Form.useForm();
 
   // Fetch all hostels
-  const fetchHostels = async () => {
-    try {
-      const response = await api.get('https://beiyo-admin.in/api/hostels');
-      setHostels(response.data);
-    } catch (error) {
-      message.error('Error fetching hostels');
-      console.error(error);
-    }
-  };
+  // const fetchHostels = async () => {
+  //   try {
+  //     const response = await api.get('https://beiyo-admin.in/api/hostels');
+  //     setHostels(response.data);
+  //   } catch (error) {
+  //     message.error('Error fetching hostels');
+  //     console.error(error);
+  //   }
+  // };
+
+  const fetchHostels = useFetchHostels()
 
   // Fetch expenses for the selected hostel
   const fetchExpenses = async () => {
@@ -390,7 +392,7 @@ const MonthlyExpenses = () => {
   };
 
   useEffect(() => {
-    fetchHostels();
+    fetchHostels;
   }, []);
 
   useEffect(() => {
